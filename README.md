@@ -48,11 +48,11 @@ npm install soliditypack
 Then import only what you need to save bytecode:
 
 ```solidity
-// For encoding only (~30% smaller bytecode)
+// For encoding only (smaller bytecode)
 import "soliditypack/contracts/SolidityPackEncoder.sol";
 import "soliditypack/contracts/SolidityPackTypes.sol";
 
-// For decoding only (~30% smaller bytecode)
+// For decoding only (smaller bytecode)
 import "soliditypack/contracts/SolidityPackDecoder.sol";
 import "soliditypack/contracts/SolidityPackTypes.sol";
 
@@ -288,7 +288,7 @@ const decoded = decode(encoded);
 
 ## Object Field Helpers
 
-Convenience functions that make encoding objects 50% more concise:
+Convenience functions that make encoding objects easier:
 
 ### Before (Verbose)
 
@@ -355,7 +355,7 @@ function encodeTransaction(
 ```
 
 **Benefits:**
-- 50% fewer lines of code for object encoding
+- Less code for object encoding
 - More readable and maintainable
 - Same gas efficiency (no overhead)
 - Backward compatible (old API still works)
@@ -480,7 +480,7 @@ npm run example              # All encoding/decoding examples
 npm run example:decode       # General decode examples
 npm run example:nested       # Nested structure examples
 npm run example:msgpack      # MessagePack compatibility
-npm run example:user         # Your requested example: {test: 42, test2: []}
+npm run example:user         # Example: {test: 42, test2: []}
 ```
 
 ### Run Solidity Tests
@@ -534,14 +534,14 @@ Import **only what you need**:
 ```solidity
 import "soliditypack/contracts/SolidityPackEncoder.sol";
 import "soliditypack/contracts/SolidityPackTypes.sol";
-// ~30% smaller bytecode vs importing both
+// Smaller bytecode vs importing both
 ```
 
 ### Decoder Only
 ```solidity
 import "soliditypack/contracts/SolidityPackDecoder.sol";
 import "soliditypack/contracts/SolidityPackTypes.sol";
-// ~30% smaller bytecode vs importing both
+// Smaller bytecode vs importing both
 ```
 
 ### Both
@@ -608,7 +608,7 @@ The decoder:
 
 ## Performance
 
-- **Compact**: ~30-50% smaller than JSON for typical data
+- **Compact**: More compact than JSON for typical data
 - **Fast**: Hand-optimized assembly for critical paths
 - **Gas Efficient**: Minimal gas usage in Solidity
 - **No External Calls**: Pure functions, no SLOAD/SSTORE
