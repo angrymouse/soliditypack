@@ -286,9 +286,9 @@ const decoded = decode(encoded);
 // Perfect round-trip! Handles arbitrary nesting.
 ```
 
-## 🎨 Improved Solidity API
+## 🎨 Primitives for working with objects
 
-SolidityPack v2 introduces **convenience functions** that make encoding objects **50% more concise**!
+SolidityPack has a number of **convenience functions** that make encoding objects **50% more concise**!
 
 ### Before (Verbose)
 
@@ -333,7 +333,7 @@ encodeFieldAddressArray(enc, "key", addressArray)
 encodeFieldStringArray(enc, "key", stringArray)
 ```
 
-### Real-World Example
+### Example
 
 ```solidity
 function encodeTransaction(
