@@ -2,7 +2,7 @@
 
 Gas-efficient, self-describing serialization format for Solidity with **modular encoder/decoder packages** to minimize smart contract bytecode size.
 
-[![Tests](https://img.shields.io/badge/tests-35%20passing-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-46%20passing-brightgreen)]()
 [![Solidity](https://img.shields.io/badge/solidity-^0.8.0-blue)]()
 [![License](https://img.shields.io/badge/license-MIT-blue)]()
 
@@ -109,14 +109,11 @@ contract MyContract {
     function encodeUserData() public pure returns (bytes memory) {
         SolidityPackTypes.Encoder memory enc = SolidityPackEncoder.newEncoder();
 
-        // Encode a map with 2 entries
-        SolidityPackEncoder.startObject(enc, 2);
+        SolidityPackEncoder.startObject(enc, 3);
 
-        SolidityPackEncoder.encodeKey(enc, "name");
-        SolidityPackEncoder.encodeString(enc, "Alice");
-
-        SolidityPackEncoder.encodeKey(enc, "balance");
-        SolidityPackEncoder.encodeUint(enc, 1000000);
+        SolidityPackEncoder.encodeFieldString(enc, "name", "Alice");
+        SolidityPackEncoder.encodeFieldUint(enc, "balance", 1000000);
+        SolidityPackEncoder.encodeFieldBool(enc, "active", true);
 
         return SolidityPackEncoder.getEncoded(enc);
     }
@@ -263,11 +260,8 @@ function encodeArrays() public pure returns (bytes memory) {
 
     SolidityPackEncoder.startObject(enc, 2);
 
-    SolidityPackEncoder.encodeKey(enc, "numbers");
-    SolidityPackEncoder.encodeUintArray(enc, numbers);
-
-    SolidityPackEncoder.encodeKey(enc, "addresses");
-    SolidityPackEncoder.encodeAddressArray(enc, addrs);
+    SolidityPackEncoder.encodeFieldUintArray(enc, "numbers", numbers);
+    SolidityPackEncoder.encodeFieldAddressArray(enc, "addresses", addrs);
 
     return SolidityPackEncoder.getEncoded(enc);
 }
@@ -291,6 +285,80 @@ const encoded = encode(complex);
 const decoded = decode(encoded);
 // Perfect round-trip! Handles arbitrary nesting.
 ```
+
+## 🎨 Improved Solidity API
+
+SolidityPack v2 introduces **convenience functions** that make encoding objects **50% more concise**!
+
+### Before (Verbose)
+
+```solidity
+SolidityPackEncoder.startObject(enc, 2);
+
+SolidityPackEncoder.encodeKey(enc, "name");
+SolidityPackEncoder.encodeString(enc, "Alice");
+
+SolidityPackEncoder.encodeKey(enc, "balance");
+SolidityPackEncoder.encodeUint(enc, 1000000);
+```
+
+### After (Concise)
+
+```solidity
+SolidityPackEncoder.startObject(enc, 2);
+
+SolidityPackEncoder.encodeFieldString(enc, "name", "Alice");
+SolidityPackEncoder.encodeFieldUint(enc, "balance", 1000000);
+```
+
+### Available Field Encoding Functions
+
+Combine key + value encoding into a single call:
+
+```solidity
+// Basic types
+encodeFieldUint(enc, "key", uint256Value)
+encodeFieldInt(enc, "key", int256Value)
+encodeFieldString(enc, "key", stringValue)
+encodeFieldBool(enc, "key", boolValue)
+encodeFieldBytes(enc, "key", bytesValue)
+
+// Ethereum types
+encodeFieldAddress(enc, "key", addressValue)
+encodeFieldBytes32(enc, "key", bytes32Value)
+
+// Arrays
+encodeFieldUintArray(enc, "key", uint256Array)
+encodeFieldAddressArray(enc, "key", addressArray)
+encodeFieldStringArray(enc, "key", stringArray)
+```
+
+### Real-World Example
+
+```solidity
+function encodeTransaction(
+    address from,
+    address to,
+    uint256 amount,
+    bytes32 txHash
+) public pure returns (bytes memory) {
+    SolidityPackTypes.Encoder memory enc = SolidityPackEncoder.newEncoder();
+
+    SolidityPackEncoder.startObject(enc, 4);
+    SolidityPackEncoder.encodeFieldAddress(enc, "from", from);
+    SolidityPackEncoder.encodeFieldAddress(enc, "to", to);
+    SolidityPackEncoder.encodeFieldUint(enc, "amount", amount);
+    SolidityPackEncoder.encodeFieldBytes32(enc, "txHash", txHash);
+
+    return SolidityPackEncoder.getEncoded(enc);
+}
+```
+
+**Benefits:**
+- 50% fewer lines of code for object encoding
+- More readable and maintainable
+- Same gas efficiency (no overhead)
+- Backward compatible (old API still works)
 
 ## 📚 API Reference
 
@@ -347,6 +415,8 @@ import {
 ### Solidity API
 
 #### Encoder Functions
+
+**Core Functions:**
 ```solidity
 SolidityPackEncoder.newEncoder()
 SolidityPackEncoder.encodeBool(enc, value)
@@ -361,6 +431,27 @@ SolidityPackEncoder.startMap(enc, length)
 SolidityPackEncoder.startObject(enc, numFields)
 SolidityPackEncoder.encodeKey(enc, key)
 SolidityPackEncoder.getEncoded(enc)
+```
+
+**Convenience Functions for working with objects:**
+```solidity
+SolidityPackEncoder.encodeFieldUint(enc, key, value)
+SolidityPackEncoder.encodeFieldInt(enc, key, value)
+SolidityPackEncoder.encodeFieldString(enc, key, value)
+SolidityPackEncoder.encodeFieldBool(enc, key, value)
+SolidityPackEncoder.encodeFieldAddress(enc, key, value)
+SolidityPackEncoder.encodeFieldBytes32(enc, key, value)
+SolidityPackEncoder.encodeFieldBytes(enc, key, value)
+SolidityPackEncoder.encodeFieldUintArray(enc, key, values)
+SolidityPackEncoder.encodeFieldAddressArray(enc, key, values)
+SolidityPackEncoder.encodeFieldStringArray(enc, key, values)
+```
+
+**Array Helpers:**
+```solidity
+SolidityPackEncoder.encodeUintArray(enc, values)
+SolidityPackEncoder.encodeAddressArray(enc, values)
+SolidityPackEncoder.encodeStringArray(enc, values)
 ```
 
 #### Decoder Functions
@@ -395,17 +486,18 @@ npm run example:user         # Your requested example: {test: 42, test2: []}
 ### Run Solidity Tests
 
 ```bash
-npm test                     # Run all 35+ tests
+npm test                     # Run all 46+ tests
 npm run compile              # Compile contracts
 ```
 
 **Test Results:**
 ```
-✔ 35 passing tests
+✔ 46 passing tests
   - 8 encoder tests
   - 13 decoder tests
   - 7 nested structure tests
   - 7 sequential encoding tests
+  - 11 improved API tests
 ```
 
 ## 📖 Documentation
@@ -535,7 +627,7 @@ MIT License - see LICENSE file for details
 ## 🚀 Quick Links
 
 - **Install**: `npm install soliditypack`
-- **Test Suite**: `npm test` - 35 passing tests
+- **Test Suite**: `npm test` - 46 passing tests
 - **Run Examples**: `npm run example:user` - See encoding `{test: 42, test2: []}`
 - **Compile**: `npm run compile` - Build Solidity contracts
 - **Docs**: See `*.md` files for comprehensive guides

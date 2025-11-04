@@ -353,6 +353,129 @@ library SolidityPackEncoder {
         return enc;
     }
 
+    // ============ CONVENIENCE FUNCTIONS FOR OBJECT FIELDS ============
+
+    /**
+     * @notice Convenience function to encode key + uint value in one call
+     * @dev Reduces 2 lines to 1 for object field encoding
+     */
+    function encodeFieldUint(
+        SolidityPackTypes.Encoder memory enc,
+        string memory key,
+        uint256 value
+    ) internal pure returns (SolidityPackTypes.Encoder memory) {
+        encodeKey(enc, key);
+        return encodeUint(enc, value);
+    }
+
+    /**
+     * @notice Convenience function to encode key + string value in one call
+     */
+    function encodeFieldString(
+        SolidityPackTypes.Encoder memory enc,
+        string memory key,
+        string memory value
+    ) internal pure returns (SolidityPackTypes.Encoder memory) {
+        encodeKey(enc, key);
+        return encodeString(enc, value);
+    }
+
+    /**
+     * @notice Convenience function to encode key + address value in one call
+     */
+    function encodeFieldAddress(
+        SolidityPackTypes.Encoder memory enc,
+        string memory key,
+        address value
+    ) internal pure returns (SolidityPackTypes.Encoder memory) {
+        encodeKey(enc, key);
+        return encodeAddress(enc, value);
+    }
+
+    /**
+     * @notice Convenience function to encode key + bool value in one call
+     */
+    function encodeFieldBool(
+        SolidityPackTypes.Encoder memory enc,
+        string memory key,
+        bool value
+    ) internal pure returns (SolidityPackTypes.Encoder memory) {
+        encodeKey(enc, key);
+        return encodeBool(enc, value);
+    }
+
+    /**
+     * @notice Convenience function to encode key + bytes32 value in one call
+     */
+    function encodeFieldBytes32(
+        SolidityPackTypes.Encoder memory enc,
+        string memory key,
+        bytes32 value
+    ) internal pure returns (SolidityPackTypes.Encoder memory) {
+        encodeKey(enc, key);
+        return encodeBytes32(enc, value);
+    }
+
+    /**
+     * @notice Convenience function to encode key + bytes value in one call
+     */
+    function encodeFieldBytes(
+        SolidityPackTypes.Encoder memory enc,
+        string memory key,
+        bytes memory value
+    ) internal pure returns (SolidityPackTypes.Encoder memory) {
+        encodeKey(enc, key);
+        return encodeBytes(enc, value);
+    }
+
+    /**
+     * @notice Convenience function to encode key + int256 value in one call
+     */
+    function encodeFieldInt(
+        SolidityPackTypes.Encoder memory enc,
+        string memory key,
+        int256 value
+    ) internal pure returns (SolidityPackTypes.Encoder memory) {
+        encodeKey(enc, key);
+        return encodeInt(enc, value);
+    }
+
+    /**
+     * @notice Convenience function to encode key + uint array value in one call
+     */
+    function encodeFieldUintArray(
+        SolidityPackTypes.Encoder memory enc,
+        string memory key,
+        uint256[] memory values
+    ) internal pure returns (SolidityPackTypes.Encoder memory) {
+        encodeKey(enc, key);
+        return encodeUintArray(enc, values);
+    }
+
+    /**
+     * @notice Convenience function to encode key + address array value in one call
+     */
+    function encodeFieldAddressArray(
+        SolidityPackTypes.Encoder memory enc,
+        string memory key,
+        address[] memory values
+    ) internal pure returns (SolidityPackTypes.Encoder memory) {
+        encodeKey(enc, key);
+        return encodeAddressArray(enc, values);
+    }
+
+    /**
+     * @notice Convenience function to encode key + string array value in one call
+     */
+    function encodeFieldStringArray(
+        SolidityPackTypes.Encoder memory enc,
+        string memory key,
+        string[] memory values
+    ) internal pure returns (SolidityPackTypes.Encoder memory) {
+        encodeKey(enc, key);
+        return encodeStringArray(enc, values);
+    }
+
     function getEncoded(
         SolidityPackTypes.Encoder memory enc
     ) internal pure returns (bytes memory) {
