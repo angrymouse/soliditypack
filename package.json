@@ -1,6 +1,6 @@
 {
   "name": "soliditypack",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Gas-efficient, self-describing serialization format for Solidity with modular encoder/decoder packages",
   "main": "./index.js",
   "type": "module",

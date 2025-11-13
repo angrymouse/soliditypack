@@ -1,0 +1,13 @@
+{
+  "_format": "hh3-artifact-1",
+  "contractName": "SolidityPackEncoder",
+  "sourceName": "contracts/SolidityPackEncoder.sol",
+  "abi": [],
+  "bytecode": "0x60556032600b8282823980515f1a607314602657634e487b7160e01b5f525f60045260245ffd5b305f52607381538281f3fe730000000000000000000000000000000000000000301460806040525f80fdfea26469706673582212205283bef690cd3e85ed5d481fa66bbb6d82f1579b83a19362524feef1d8ae1c6d64736f6c63430008140033",
+  "deployedBytecode": "0x730000000000000000000000000000000000000000301460806040525f80fdfea26469706673582212205283bef690cd3e85ed5d481fa66bbb6d82f1579b83a19362524feef1d8ae1c6d64736f6c63430008140033",
+  "linkReferences": {},
+  "deployedLinkReferences": {},
+  "immutableReferences": {},
+  "inputSourceName": "project/contracts/SolidityPackEncoder.sol",
+  "buildInfoId": "solc-0_8_20-951b5102829783c8ab863610c82fa31c9de4989e"
+}

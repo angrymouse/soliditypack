@@ -47,7 +47,7 @@ library SPack {
     function encode(address value) internal pure returns (bytes memory) {
         bytes memory result = new bytes(21);
         result[0] = bytes1(SolidityPackTypes.ADDRESS);
-        assembly {
+        assembly ("memory-safe") {
             mstore(add(result, 33), shl(96, value))
         }
         return result;
@@ -179,13 +179,16 @@ library SPack {
     /// @notice Finalize and return encoded bytes
     function done(Builder memory b) internal pure returns (bytes memory) {
         bytes memory result = new bytes(b.pos);
-        assembly {
+        assembly ("memory-safe") {
             let src := add(mload(b), 32)
             let dst := add(result, 32)
             let len := mload(add(b, 32))
+            let end := add(src, len)
 
-            for { let i := 0 } lt(i, len) { i := add(i, 32) } {
-                mstore(add(dst, i), mload(add(src, i)))
+            for { } lt(src, end) { } {
+                mstore(dst, mload(src))
+                src := add(src, 32)
+                dst := add(dst, 32)
             }
         }
         return result;
@@ -256,7 +259,7 @@ library SPack {
             b.buffer[b.pos++] = bytes1(uint8(value));
         } else if (value <= type(uint16).max) {
             b.buffer[b.pos++] = bytes1(SolidityPackTypes.UINT16);
-            assembly {
+            assembly ("memory-safe") {
                 let ptr := add(add(mload(b), 32), mload(add(b, 32)))
                 mstore8(ptr, shr(8, value))
                 mstore8(add(ptr, 1), value)
@@ -264,7 +267,7 @@ library SPack {
             b.pos += 2;
         } else if (value <= type(uint32).max) {
             b.buffer[b.pos++] = bytes1(SolidityPackTypes.UINT32);
-            assembly {
+            assembly ("memory-safe") {
                 let ptr := add(add(mload(b), 32), mload(add(b, 32)))
                 mstore8(ptr, shr(24, value))
                 mstore8(add(ptr, 1), shr(16, value))
@@ -274,7 +277,7 @@ library SPack {
             b.pos += 4;
         } else if (value <= type(uint64).max) {
             b.buffer[b.pos++] = bytes1(SolidityPackTypes.UINT64);
-            assembly {
+            assembly ("memory-safe") {
                 let ptr := add(add(mload(b), 32), mload(add(b, 32)))
                 mstore8(ptr, shr(56, value))
                 mstore8(add(ptr, 1), shr(48, value))
@@ -288,7 +291,7 @@ library SPack {
             b.pos += 8;
         } else {
             b.buffer[b.pos++] = bytes1(SolidityPackTypes.UINT256);
-            assembly {
+            assembly ("memory-safe") {
                 let ptr := add(add(mload(b), 32), mload(add(b, 32)))
                 mstore(ptr, value)
             }
@@ -308,7 +311,7 @@ library SPack {
             b.buffer[b.pos++] = bytes1(uint8(int8(value)));
         } else {
             b.buffer[b.pos++] = bytes1(SolidityPackTypes.INT256);
-            assembly {
+            assembly ("memory-safe") {
                 let ptr := add(add(mload(b), 32), mload(add(b, 32)))
                 mstore(ptr, value)
             }
@@ -318,7 +321,7 @@ library SPack {
 
     function _writeAddr(Builder memory b, address value) private pure {
         b.buffer[b.pos++] = bytes1(SolidityPackTypes.ADDRESS);
-        assembly {
+        assembly ("memory-safe") {
             let ptr := add(add(mload(b), 32), mload(add(b, 32)))
             mstore(ptr, shl(96, value))
         }
@@ -340,11 +343,15 @@ library SPack {
             b.buffer[b.pos++] = bytes1(uint8(len));
         }
 
-        assembly {
+        assembly ("memory-safe") {
             let src := add(byt, 32)
             let dst := add(add(mload(b), 32), mload(add(b, 32)))
-            for { let i := 0 } lt(i, len) { i := add(i, 32) } {
-                mstore(add(dst, i), mload(add(src, i)))
+            let end := add(src, len)
+
+            for { } lt(src, end) { } {
+                mstore(dst, mload(src))
+                src := add(src, 32)
+                dst := add(dst, 32)
             }
         }
         b.pos += len;
@@ -362,19 +369,23 @@ library SPack {
             b.buffer[b.pos++] = bytes1(uint8(len));
         }
 
-        assembly {
+        assembly ("memory-safe") {
             let src := add(value, 32)
             let dst := add(add(mload(b), 32), mload(add(b, 32)))
-            for { let i := 0 } lt(i, len) { i := add(i, 32) } {
-                mstore(add(dst, i), mload(add(src, i)))
+            let end := add(src, len)
+
+            for { } lt(src, end) { } {
+                mstore(dst, mload(src))
+                src := add(src, 32)
+                dst := add(dst, 32)
             }
         }
         b.pos += len;
     }
 
     function _writeBytes32(Builder memory b, bytes32 value) private pure {
-        b.buffer[b.pos++] = bytes1(SolidityPackTypes.BYTES32);
-        assembly {
+        b.buffer[b.pos++] = bytes1(SolidityPackTypes.BYTES32_TYPE);
+        assembly ("memory-safe") {
             let ptr := add(add(mload(b), 32), mload(add(b, 32)))
             mstore(ptr, value)
         }
@@ -415,13 +426,16 @@ library SPack {
         if (newSize < needed) newSize = needed + 64;
 
         bytes memory newBuffer = new bytes(newSize);
-        assembly {
+        assembly ("memory-safe") {
             let src := add(mload(b), 32)
             let dst := add(newBuffer, 32)
             let len := mload(add(b, 32))
+            let end := add(src, len)
 
-            for { let i := 0 } lt(i, len) { i := add(i, 32) } {
-                mstore(add(dst, i), mload(add(src, i)))
+            for { } lt(src, end) { } {
+                mstore(dst, mload(src))
+                src := add(src, 32)
+                dst := add(dst, 32)
             }
         }
         b.buffer = newBuffer;
@@ -446,7 +460,7 @@ library SPack {
         if (value <= type(uint32).max) {
             bytes memory result = new bytes(5);
             result[0] = bytes1(SolidityPackTypes.UINT32);
-            assembly {
+            assembly ("memory-safe") {
                 let ptr := add(result, 33)
                 mstore8(ptr, shr(24, value))
                 mstore8(add(ptr, 1), shr(16, value))
@@ -458,7 +472,7 @@ library SPack {
         // Full uint256
         bytes memory result = new bytes(33);
         result[0] = bytes1(SolidityPackTypes.UINT256);
-        assembly {
+        assembly ("memory-safe") {
             mstore(add(result, 33), value)
         }
         return result;
@@ -475,7 +489,7 @@ library SPack {
 
         bytes memory result = new bytes(33);
         result[0] = bytes1(SolidityPackTypes.INT256);
-        assembly {
+        assembly ("memory-safe") {
             mstore(add(result, 33), value)
         }
         return result;
@@ -547,7 +561,7 @@ library SPack {
     function _addr(SolidityPackTypes.Encoder memory e, address v) private pure {
         _ensureCapacityOld(e, 21);
         e.buffer[e.pos++] = bytes1(SolidityPackTypes.ADDRESS);
-        assembly {
+        assembly ("memory-safe") {
             let ptr := add(add(mload(e), 32), mload(add(e, 32)))
             mstore(ptr, shl(96, v))
         }
@@ -556,12 +570,16 @@ library SPack {
 
     function _done(SolidityPackTypes.Encoder memory e) private pure returns (bytes memory) {
         bytes memory result = new bytes(e.pos);
-        assembly {
+        assembly ("memory-safe") {
             let src := add(mload(e), 32)
             let dst := add(result, 32)
             let len := mload(add(e, 32))
-            for { let i := 0 } lt(i, len) { i := add(i, 32) } {
-                mstore(add(dst, i), mload(add(src, i)))
+            let end := add(src, len)
+
+            for { } lt(src, end) { } {
+                mstore(dst, mload(src))
+                src := add(src, 32)
+                dst := add(dst, 32)
             }
         }
         return result;
@@ -575,7 +593,7 @@ library SPack {
             e.buffer[e.pos++] = bytes1(uint8(value));
         } else if (value <= type(uint32).max) {
             e.buffer[e.pos++] = bytes1(SolidityPackTypes.UINT32);
-            assembly {
+            assembly ("memory-safe") {
                 let ptr := add(add(mload(e), 32), mload(add(e, 32)))
                 mstore8(ptr, shr(24, value))
                 mstore8(add(ptr, 1), shr(16, value))
@@ -585,7 +603,7 @@ library SPack {
             e.pos += 4;
         } else {
             e.buffer[e.pos++] = bytes1(SolidityPackTypes.UINT256);
-            assembly {
+            assembly ("memory-safe") {
                 let ptr := add(add(mload(e), 32), mload(add(e, 32)))
                 mstore(ptr, value)
             }
@@ -601,12 +619,16 @@ library SPack {
         if (newSize < needed) newSize = needed + 64;
 
         bytes memory newBuffer = new bytes(newSize);
-        assembly {
+        assembly ("memory-safe") {
             let src := add(mload(e), 32)
             let dst := add(newBuffer, 32)
             let len := mload(add(e, 32))
-            for { let i := 0 } lt(i, len) { i := add(i, 32) } {
-                mstore(add(dst, i), mload(add(src, i)))
+            let end := add(src, len)
+
+            for { } lt(src, end) { } {
+                mstore(dst, mload(src))
+                src := add(src, 32)
+                dst := add(dst, 32)
             }
         }
         e.buffer = newBuffer;
